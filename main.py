@@ -96,8 +96,9 @@ async def brave_search(query: str, count: int = 20) -> dict:
 # x402 middleware (lightweight manual implementation)
 # ---------------------------------------------------------------------------
 
-def build_payment_required_response(path: str) -> JSONResponse:
+def build_payment_required_response(path: str, base_url: str = "") -> JSONResponse:
     """Return a 402 Payment Required response per the x402 spec."""
+    resource = (base_url.rstrip("/") + path) if base_url else path
     payload = {
         "x402Version": 1,
         "error": "Payment required",
@@ -106,7 +107,7 @@ def build_payment_required_response(path: str) -> JSONResponse:
                 "scheme": "exact",
                 "network": X402_NETWORK,
                 "maxAmountRequired": str(X402_PRICE_USDC_UNITS),
-                "resource": path,
+                "resource": resource,
                 "description": "Token Sentiment Score API call",
                 "mimeType": "application/json",
                 "payTo": WALLET_ADDRESS,
@@ -183,7 +184,8 @@ async def health():
 async def analyze(request: Request, body: AnalyzeRequest):
     # --- x402 gate ---
     if not verify_payment_header(request):
-        return build_payment_required_response("/api/analyze")
+        base = str(request.base_url).rstrip("/")
+        return build_payment_required_response("/api/analyze", base)
 
     symbol = body.token_symbol.upper().strip()
     name = body.token_name.strip()
