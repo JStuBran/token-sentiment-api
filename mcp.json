@@ -1,0 +1,44 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "Token Sentiment Score",
+  "name_for_model": "token_sentiment_score",
+  "description_for_human": "Get social sentiment scores for any crypto token using recent Twitter and Reddit mentions.",
+  "description_for_model": "Analyzes recent social media mentions of a crypto token and returns a sentiment score from -100 (very negative) to +100 (very positive), along with positive/negative/neutral ratios and a plain-English summary. Requires x402 micropayment ($0.05 per call on Base network).",
+  "auth": {
+    "type": "x402",
+    "network": "base",
+    "price_usd": 0.05
+  },
+  "api": {
+    "type": "openapi",
+    "url": "/openapi.json"
+  },
+  "tools": [
+    {
+      "name": "analyze_token_sentiment",
+      "description": "Analyze social sentiment for a crypto token.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "token_symbol": {
+            "type": "string",
+            "description": "Ticker symbol, e.g. BTC"
+          },
+          "token_name": {
+            "type": "string",
+            "description": "Full name, e.g. Bitcoin"
+          },
+          "chain_id": {
+            "type": "integer",
+            "description": "Optional chain ID, e.g. 8453 for Base"
+          }
+        },
+        "required": ["token_symbol", "token_name"]
+      },
+      "endpoint": {
+        "method": "POST",
+        "path": "/api/analyze"
+      }
+    }
+  ]
+}
